@@ -96,6 +96,13 @@ trait EntityTrait
     protected $_errors = [];
 
     /**
+     * List of invalid fields and their data for errors upon validation/patching
+     *
+     * @var array
+     */
+    protected $_invalid = [];
+
+    /**
      * Map of properties in this entity that can be safely assigned, each
      * property name points to a boolean indicating its status. An empty array
      * means no properties are accessible
@@ -601,6 +608,7 @@ trait EntityTrait
 
         $this->_dirty[$property] = true;
         unset($this->_errors[$property]);
+        unset($this->_invalid[$property]);
         return true;
     }
 
@@ -615,6 +623,7 @@ trait EntityTrait
     {
         $this->_dirty = [];
         $this->_errors = [];
+        $this->_invalid = [];
     }
 
     /**
@@ -780,6 +789,38 @@ trait EntityTrait
     }
 
     /**
+     * @param string|array|null $field
+     * @param string|null $value
+     * @param bool $overwrite
+     * @return $this|mixed
+     */
+    public function invalid($field = null, $value = null, $overwrite = false)
+    {
+        if ($field === null) {
+            return $this->_invalid;
+        }
+
+        if (is_string($field) && $value === null) {
+            $value = isset($this->_invalid[$field]) ? $this->_invalid[$field] : null;
+            return $value;
+        }
+
+        if (!is_array($field)) {
+            $field = [$field => $value];
+        }
+
+        foreach ($field as $f => $value) {
+            if ($overwrite) {
+                $this->_invalid[$f] = $value;
+                continue;
+            }
+            $this->_invalid += [$f => $value];
+        }
+
+        return $this;
+    }
+
+    /**
      * Stores whether or not a property value can be changed or set in this entity.
      * The special property `*` can also be marked as accessible or protected, meaning
      * that any other property specified before will take its value. For example
@@ -881,6 +922,7 @@ trait EntityTrait
             '[original]' => $this->_original,
             '[virtual]' => $this->_virtual,
             '[errors]' => $this->_errors,
+            '[invalid]' => $this->_invalid,
             '[repository]' => $this->_registryAlias
         ];
     }

@@ -327,6 +327,13 @@ class RulesChecker
                 $message = [$message];
             }
             $entity->errors($options['errorField'], $message);
+
+            $invalid = null;
+            if (isset($entity->{$options['errorField']})) {
+                $invalid = $entity->{$options['errorField']};
+            }
+            $entity->invalid($options['errorField'], $invalid);
+
             return $pass === true;
         };
     }
