@@ -332,8 +332,9 @@ class RulesChecker
             if (isset($entity->{$options['errorField']})) {
                 $invalid = $entity->{$options['errorField']};
             }
-            $entity->invalid($options['errorField'], $invalid);
-
+            if (method_exists($entity, 'invalid')) {
+                $entity->invalid($options['errorField'], $invalid);
+            }
             return $pass === true;
         };
     }

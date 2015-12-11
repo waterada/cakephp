@@ -607,8 +607,7 @@ trait EntityTrait
         }
 
         $this->_dirty[$property] = true;
-        unset($this->_errors[$property]);
-        unset($this->_invalid[$property]);
+        unset($this->_errors[$property], $this->_invalid[$property]);
         return true;
     }
 
